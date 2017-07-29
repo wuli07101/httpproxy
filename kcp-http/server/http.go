@@ -123,11 +123,7 @@ func handleHttpProxy_2(client io.ReadWriteCloser) {
 	if req.Method == "CONNECT" {
 		client.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
 	} else {
-<<<<<<< HEAD
-        dump, _ := httputil.DumpRequestOut(req, true)
-=======
 		dump, _ := httputil.DumpRequestOut(req, true)
->>>>>>> 684cdfe92f299083987853590589e21297db38fa
 		server.Write(dump)
 		log.Printf("%s",dump)
 	}
