@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	kcp "github.com/xtaci/kcp-go"
 	"os"
 )
 
@@ -32,6 +33,7 @@ type Config struct {
 	Log          string `json:"log"`
 	SnmpLog      string `json:"snmplog"`
 	SnmpPeriod   int    `json:"snmpperiod"`
+	KcpBlock     kcp.BlockCrypt
 }
 
 func parseJSONConfig(config *Config, path string) error {

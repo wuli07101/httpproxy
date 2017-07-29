@@ -38,7 +38,7 @@ func handleMuxHttp(conn io.ReadWriteCloser, config *Config) {
 	}
 }
 
-func handleHttpProxy(p1 io.ReadWriteCloser) {
+func handleHttpProxy_1(p1 io.ReadWriteCloser) {
 	log.Println("stream opened")
 	defer log.Println("stream closed")
 	defer p1.Close()
@@ -52,6 +52,7 @@ func handleHttpProxy(p1 io.ReadWriteCloser) {
 	}
 
 	var method, host, address string
+	log.Println(string(b[:bytes.IndexByte(b[:], '\n')]))
 	fmt.Sscanf(string(b[:bytes.IndexByte(b[:], '\n')]), "%s%s", &method, &host)
 	hostPortURL, err := url.Parse(host)
 	if err != nil {
@@ -68,7 +69,6 @@ func handleHttpProxy(p1 io.ReadWriteCloser) {
 			address = hostPortURL.Host
 		}
 	}
-
 	//获得了请求的host和port，就开始拨号吧
 	p2, err := net.Dial("tcp", address)
 	if err != nil {
@@ -78,6 +78,7 @@ func handleHttpProxy(p1 io.ReadWriteCloser) {
 	if method == "CONNECT" {
 		fmt.Fprint(p1, "HTTP/1.1 200 Connection established\r\n\r\n")
 	} else {
+		log.Printf("%s",b[:n])
 		p2.Write(b[:n])
 	}
 
@@ -106,14 +107,13 @@ func handleHttpProxy_2(client io.ReadWriteCloser) {
 		log.Println(err)
 		return
 	}
-
+   
 	var address string
 	if strings.Index(req.URL.Host, ":") == -1 {
 		address = req.URL.Host + ":80"
 	} else {
 		address = req.URL.Host
 	}
-
 	//获得了请求的host和port，就开始拨号吧
 	server, err := net.Dial("tcp", address)
 	if err != nil {
@@ -123,8 +123,9 @@ func handleHttpProxy_2(client io.ReadWriteCloser) {
 	if req.Method == "CONNECT" {
 		client.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
 	} else {
-		dump, _ := httputil.DumpRequest(req, true)
+        dump, _ := httputil.DumpRequestOut(req, true)
 		server.Write(dump)
+		log.Printf("%s",dump)
 	}
 
 	// start tunnel
